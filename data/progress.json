@@ -2,8 +2,20 @@
   "stats": {},
   "current_index": 0,
   "field_order": null,
-  "hidden_columns": { "study": [], "review": [] },
-  "quiz_scenarios": [],
+  "hidden_columns": {
+    "study": [],
+    "review": []
+  },
+  "quiz_scenarios": [
+    {
+      "root": "Kanji",
+      "exclude": []
+    }
+  ],
   "furigana": false,
-  "volumes": { "jp": 0.8, "vi": 1.0, "en": 0.9 }
+  "volumes": {
+    "jp": 0.8,
+    "vi": 1,
+    "en": 0.9
+  }
 }
