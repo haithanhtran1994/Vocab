@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="VocabMaster">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Vocab Master Pro (GitHub Sync)</title>
+<script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="screentip" class="screentip"></div>
+<div id="screentip-btns" class="screentip-btns hidden"></div>
+
+<div id="vol-popup" class="vol-popup hidden">
+  <h4>🔊 Âm lượng giọng đọc</h4>
+  <div class="vol-row"><span class="vol-lang">🇯🇵</span>
+    <input type="range" id="volJP" min="0" max="1" step="0.05" value="0.8" oninput="document.getElementById('pJP').textContent=Math.round(this.value*100)+'%';saveVolumes()">
+    <span id="pJP" class="vol-pct">80%</span></div>
+  <div class="vol-row"><span class="vol-lang">🇻🇳</span>
+    <input type="range" id="volVI" min="0" max="1" step="0.05" value="1.0" oninput="document.getElementById('pVI').textContent=Math.round(this.value*100)+'%';saveVolumes()">
+    <span id="pVI" class="vol-pct">100%</span></div>
+  <div class="vol-row"><span class="vol-lang">🇺🇸</span>
+    <input type="range" id="volEN" min="0" max="1" step="0.05" value="0.9" oninput="document.getElementById('pEN').textContent=Math.round(this.value*100)+'%';saveVolumes()">
+    <span id="pEN" class="vol-pct">90%</span></div>
+  <button class="vol-popup-close" onclick="closeVolPopup()">Đóng</button>
+</div>
+
+<div id="audio-unlock" class="hidden">
+  <h2>🔊 Sẵn sàng học tập</h2>
+  <p>Nhấn để kích hoạt âm thanh.</p>
+  <button onclick="unlockAudio()" style="background:var(--success);color:white;padding:20px 40px;font-size:1.2rem">BẮT ĐẦU NGAY</button>
+</div>
+
+<!-- ── MÀN HÌNH KẾT NỐI GITHUB ── -->
+<div id="connect-screen" class="container">
+  <h2 style="text-align:center">🔗 Kết nối GitHub</h2>
+  <div class="hint-box">
+    App sẽ đọc/ghi 2 file JSON trong repo của bạn:<br>
+    <b>data/vocab.json</b> (từ vựng) và <b>data/progress.json</b> (tiến độ học).<br>
+    Cần một <b>Personal Access Token</b> (fine-grained, chỉ cấp quyền <i>Contents: Read & Write</i> cho đúng repo này) để app có thể LƯU dữ liệu. Token chỉ lưu trong trình duyệt của bạn (localStorage), không gửi đi đâu khác ngoài GitHub.
+  </div>
+  <div class="input-row"><label>GitHub Owner (username/org)</label><input id="inp-gh-owner" placeholder="vd: haitt"></div>
+  <div class="input-row"><label>Repo</label><input id="inp-gh-repo" placeholder="vd: vocab-master-pro"></div>
+  <div class="input-row"><label>Branch</label><input id="inp-gh-branch" placeholder="main"></div>
+  <div class="input-row"><label>Personal Access Token</label><input id="inp-gh-token" type="password" placeholder="ghp_... (để trống nếu đã lưu trước đó)"></div>
+  <button id="btn-connect" class="btn-primary-lg" onclick="connectAndLoad()">Kết nối &amp; Tải dữ liệu</button>
+</div>
+
+<div id="study-screen" class="container hidden">
+  <div class="top-bar">
+    <div style="flex:1"></div>
+    <div id="sync-status"></div>
+    <div style="flex:1;text-align:right"><button class="btn-gear" onclick="openSettings()" title="Cài đặt GitHub">⚙️</button></div>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;gap:10px;background:#f8fafc;padding:10px;border-radius:12px;border:1px solid #e2e8f0">
+    <div style="flex:1">
+      <div class="mode-menu-container" onclick="toggleModeMenu(event)">
+        <h3 id="mode-title" style="margin:0;color:var(--primary);font-size:.85rem;text-transform:uppercase;display:flex;align-items:center;gap:5px">Chế độ học tập <span id="menu-arrow">▾</span></h3>
+        <div id="mode-dropdown" class="mode-dropdown">
+          <div class="mode-item" onclick="selectMode('study',event)">📚 Học tập</div>
+          <div class="mode-item" onclick="selectMode('review',event)">🔄 Ôn tập</div>
+          <div class="mode-item" onclick="showQuizScreen(event)">📝 Trắc nghiệm</div>
+        </div>
+      </div>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">
+      <span id="word-counter-top" style="font-weight:800;font-size:.9rem;color:#1e293b">0/0</span>
+      <div id="status-display-top" onclick="setStatus(null)" style="font-size:1.2rem;height:1.4rem;cursor:pointer"></div>
+    </div>
+    <div style="flex:1;text-align:right">
+      <button class="btn-hide-cols" onclick="openColumnModal()">👁️ Cột</button>
+    </div>
+  </div>
+
+  <div id="column-modal-root" class="modal-overlay hidden">
+    <div class="column-modal">
+      <h3 style="margin-top:0">Thiết lập & Thứ tự cột</h3>
+      <p style="font-size:.8rem;color:#64748b;margin:0 0 5px">Tick=ẨN | ↑↓=đổi thứ tự</p>
+      <div id="column-checkbox-list" class="column-list"></div>
+      <div class="modal-footer">
+        <button class="btn-confirm" onclick="applyColumnVisibility()">Xác nhận</button>
+        <button class="btn-cancel" onclick="closeColumnModal()">Hủy</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="field-nav">
+    <div class="nav-zone" onclick="changeField(-1)"><span id="btn-prev-field" class="nav-arrow-small">❮</span><span id="prev-field" class="field-label-side"></span></div>
+    <div class="nav-zone-active"><span id="curr-field" class="field-active"></span></div>
+    <div class="nav-zone" onclick="changeField(1)"><span id="next-field" class="field-label-side"></span><span id="btn-next-field" class="nav-arrow-small">❯</span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-touch-zone">
+      <div id="display-text" class="card-content">---</div>
+      <div id="speaker-hint" style="position:absolute;bottom:15px;left:50%;transform:translateX(-50%);font-size:11px;color:#cbd5e1;letter-spacing:1px;pointer-events:none;text-transform:uppercase;font-weight:bold">Chạm để đọc</div>
+    </div>
+  </div>
+
+  <div class="voice-settings">
+    <span>Tốc độ: <input type="range" id="voiceRate" min=".25" max="3" step=".25" value="1" oninput="document.getElementById('speed-display').innerText=this.value+'x'"><span id="speed-display" class="speed-val">1x</span></span>
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <label><input type="checkbox" id="autoSpeak" checked> Tự động đọc</label>
+      <label id="random-multi-wrap"><input type="checkbox" id="randomMulti" checked> Random</label>
+      <button onclick="enterEditMode()" style="background:#f59e0b;color:white;border:none;border-radius:8px;padding:6px 12px;font-size:.8rem;font-weight:bold">✏️ Edit</button>
+    </div>
+    <div style="display:flex;gap:5px;width:100%;margin-top:5px">
+      <button id="furiganaToggle" onclick="toggleFurigana()" style="flex:1;background:#e2e8f0;color:#475569;padding:8px;border-radius:8px;font-size:.8rem;font-weight:bold;border:1px solid #cbd5e1">Furigana: OFF</button>
+      <button id="btn-vol-toggle" onclick="toggleVolPopup(event)" style="flex:1;background:#0891b2;color:white;padding:8px;border-radius:8px;font-size:.8rem;font-weight:bold;border:none">🔊 Âm lượng</button>
+      <button onclick="toggleDataMenu()" id="btn-data-toggle" style="flex:1;background:#334155;color:white;padding:8px;border-radius:8px;font-size:.8rem;font-weight:bold;border:none">Data ▾</button>
+    </div>
+  </div>
+
+  <div id="data-controls-wrapper" class="hidden" style="margin-top:10px;background:#f1f5f9;padding:15px;border-radius:12px;border:1px solid #e2e8f0">
+    <div class="action-panel" style="margin-top:0;border-top:none;padding:0">
+      <button class="btn-sync" onclick="exportFullBackup()" style="background:#6366f1">💾 Backup (.json)</button>
+      <button class="btn-sync" onclick="showAddFromFile()" style="background:#8b5cf6">➕ Thêm từ (.xlsx)</button>
+    </div>
+    <div style="margin-top:10px;display:flex;flex-direction:column;gap:10px;align-items:center">
+      <button style="background:#1e293b;color:white;width:100%;padding:12px;border-radius:10px;font-weight:bold" onclick="showDatabaseView()">📊 Xem &amp; Quản lý DB</button>
+      <button style="background:#0891b2;color:white;width:100%;padding:10px;border-radius:10px;font-weight:bold;font-size:.85rem" onclick="triggerReplaceFromXlsx()">📥 Nạp lại toàn bộ từ .xlsx (ghi đè)</button>
+      <input type="file" id="replaceXlsxInput" accept=".xlsx" class="hidden">
+      <button onclick="document.getElementById('backupInput').click()" style="background:#64748b;color:white;width:100%;padding:8px;border-radius:8px;font-size:.8rem">📥 Nhập Backup (.json)</button>
+      <input type="file" id="backupInput" accept=".json" class="hidden" onchange="importFullBackup(event)"/>
+      <button onclick="resetDatabase()" style="background:none;color:#ef4444;font-size:11px;border:none;text-decoration:underline;cursor:pointer">[Xóa sạch Database]</button>
+    </div>
+  </div>
+
+  <div id="review-controls" class="hidden" style="margin-top:10px">
+    <button id="btn-autoplay" class="btn-autoplay" onclick="toggleAutoPlay()" style="width:100%">▶ Tự động phát</button>
+  </div>
+
+  <div id="add-file-panel" class="hidden" style="margin-top:20px;padding:15px;background:#fefce8;border:1px solid #fef08a;border-radius:12px">
+    <h4 style="margin:0 0 10px 0">➕ Thêm từ vựng từ File</h4>
+    <input type="file" id="addWordsFileInput" accept=".xlsx" style="font-size:.8rem;margin-bottom:10px;width:100%">
+    <div style="display:flex;gap:10px">
+      <button onclick="confirmAddFromFile()" style="background:var(--success);color:white;padding:8px;flex:1">Xác nhận</button>
+      <button onclick="hideAddFromFile()" style="background:#94a3b8;color:white;padding:8px;flex:1">Hủy</button>
+    </div>
+  </div>
+</div>
+
+<div id="db-view-screen" class="container db-view-container hidden">
+  <h3>📊 Quản lý Database Vocab</h3>
+  <button class="btn-add-row" onclick="addRowToExcel()">➕ Thêm hàng</button>
+  <div class="excel-table-wrapper"><table class="excel-table"><thead id="excel-thead"></thead><tbody id="excel-tbody"></tbody></table></div>
+  <div style="display:flex;gap:10px;justify-content:flex-end">
+    <button class="btn-db-action btn-confirm" onclick="saveExcelChanges()">Lưu lên GitHub</button>
+    <button class="btn-db-action btn-cancel" onclick="exitDatabaseView()">Thoát</button>
+  </div>
+</div>
+
+<div id="quiz-screen" class="container hidden">
+  <h2 id="quiz-header-title">📝 Trắc nghiệm</h2>
+  <div id="quiz-setup">
+    <div style="margin-bottom:15px">
+      Số câu: <input type="number" id="quizCount" placeholder="Tất cả" style="width:80px;padding:8px;border:1px solid #cbd5e1;border-radius:8px">
+      TGian/câu(s): <input type="number" id="timePerQuestion" value="10" style="width:60px;padding:8px;border:1px solid #cbd5e1;border-radius:8px">
+      <button onclick="addScenario()" style="background:var(--primary);color:white;padding:8px 15px;font-size:.8rem;margin-left:10px">+ Kịch bản</button>
+    </div>
+    <div id="scenarios-list"></div>
+    <div style="margin-top:20px;display:flex;gap:10px">
+      <button onclick="startQuiz()" style="background:var(--success);color:white;flex:1">Bắt đầu</button>
+      <button onclick="exitQuiz()" style="background:#94a3b8;color:white;flex:1">Hủy</button>
+    </div>
+  </div>
+  <div id="quiz-playing" class="hidden">
+    <div id="quiz-timer-box">⏱ <span id="time-left">00:00</span></div>
+    <div id="quiz-result-summary" class="hidden"></div>
+    <div id="quiz-container"></div>
+    <button id="quiz-finish-btn" class="btn-finish" onclick="finishQuiz()">Nộp bài</button>
+    <button class="btn-finish" style="background:#64748b;margin-top:10px" onclick="exitQuiz()">Quay lại</button>
+  </div>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/github-api.js"></script>
+<script src="js/state.js"></script>
+<script src="js/ui-render.js"></script>
+<script src="js/speech.js"></script>
+<script src="js/edit.js"></script>
+<script src="js/quiz.js"></script>
+<script src="js/dbview.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
