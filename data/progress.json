@@ -1,6 +1,6 @@
 {
   "stats": {},
-  "current_index": 0,
+  "current_index": 1,
   "field_order": null,
   "hidden_columns": {
     "study": [],
@@ -12,7 +12,7 @@
       "exclude": []
     }
   ],
-  "furigana": false,
+  "furigana": true,
   "volumes": {
     "jp": 0.8,
     "vi": 1,
