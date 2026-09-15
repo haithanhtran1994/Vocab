@@ -11,8 +11,8 @@ window.CONFIG = {
     owner: 'YOUR_GITHUB_USERNAME',   // ví dụ: 'haitt'
     repo: 'YOUR_REPO_NAME',          // ví dụ: 'vocab-master-pro'
     branch: 'main',
-    vocabPath: 'data/vocab.json',
-    progressPath: 'data/progress.json'
+    vocabPath: 'vocab-data/vocab.json',
+    progressPath: 'vocab-data/progress.json'
   },
   // Không commit-per-thao-tác: gom lại rồi mới lưu để tránh spam commit.
   autosaveDebounceMs: 8000,     // sau 8s không thao tác gì thêm -> tự lưu tiến độ
