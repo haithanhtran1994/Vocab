@@ -5,14 +5,19 @@
 // (giá trị nhập trong app được lưu ở localStorage, không cần sửa file này).
 // TUYỆT ĐỐI KHÔNG bao giờ điền Personal Access Token vào file này
 // vì file này sẽ được commit công khai lên repo.
+//
+// LƯU Ý: owner/repo ở đây trỏ tới REPO PRIVATE chứa data (vd "Data"),
+// KHÔNG phải repo public chứa code app này (vd "Vocab").
 // ============================================================
 window.CONFIG = {
   github: {
-    owner: 'YOUR_GITHUB_USERNAME',   // ví dụ: 'haitt'
-    repo: 'YOUR_REPO_NAME',          // ví dụ: 'vocab-master-pro'
+    owner: 'YOUR_GITHUB_USERNAME',   // owner của repo PRIVATE chứa data
+    repo: 'YOUR_PRIVATE_DATA_REPO',  // ví dụ: 'Data'
     branch: 'main',
-    vocabPath: 'vocab-data/vocab.json',
-    progressPath: 'vocab-data/progress.json'
+    // Mỗi "bộ từ vựng" là 1 thư mục trong repo private, chứa vocab.json
+    // (+ progress.json, tự tạo khi lưu tiến độ lần đầu nếu chưa có).
+    // defaultFolder là thư mục được load khi mở app lần đầu (chưa chọn gì).
+    defaultFolder: 'vocab-data'
   },
   // Không commit-per-thao-tác: gom lại rồi mới lưu để tránh spam commit.
   autosaveDebounceMs: 8000,     // sau 8s không thao tác gì thêm -> tự lưu tiến độ

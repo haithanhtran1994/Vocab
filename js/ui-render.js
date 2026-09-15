@@ -40,7 +40,11 @@ function getFieldContent(word, idx) {
 
 function formatFurigana(text) {
   if (!text) return '';
-  return text.replace(/([一-龠々a-zA-Z0-9]+)\(([^)]+)\)/g, (_, k, f) => `<ruby>${k}<rt>${f}</rt></ruby>`);
+  // Cụm phải BẮT ĐẦU bằng 1 ký tự Kanji (một-龠), sau đó cho phép thêm Kanji/Hiragana/
+  // Katakana nối tiếp (để bắt trọn từ có đuôi okurigana kiểu "食べる(たべる)") nhưng KHÔNG
+  // được bắt đầu bằng Hiragana — nhờ vậy trợ từ đứng ngay trước (vd "を" trong "を送(おく)る")
+  // không bị nuốt nhầm vào cụm furigana.
+  return text.replace(/([一-龠々][一-龠々ぁ-んァ-ヴーa-zA-Z0-9]*)\(([^)]+)\)/g, (_, k, f) => `<ruby>${k}<rt>${f}</rt></ruby>`);
 }
 function renderJpHtmlSafe(jp) {
   if (!jp) return '';

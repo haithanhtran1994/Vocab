@@ -34,6 +34,36 @@ function ghIsConfigured() {
   return !!(owner && repo && owner !== 'YOUR_GITHUB_USERNAME' && repo !== 'YOUR_REPO_NAME' && ghHasToken());
 }
 
+// ── "Bộ từ vựng" = 1 thư mục trong repo private (vd 'vocab-data', 'N2_vocab') ──
+function ghGetCurrentFolder() {
+  return localStorage.getItem('gh_folder') || CONFIG.github.defaultFolder;
+}
+function ghSetCurrentFolder(folder) {
+  localStorage.setItem('gh_folder', folder);
+}
+function ghVocabPath(folder) {
+  return `${folder || ghGetCurrentFolder()}/vocab.json`;
+}
+function ghProgressPath(folder) {
+  return `${folder || ghGetCurrentFolder()}/progress.json`;
+}
+
+// Liệt kê nội dung thư mục gốc của repo (dùng để tìm các thư mục = các bộ từ vựng)
+async function ghListRootContents() {
+  const { owner, repo, branch } = ghGetOwnerRepoBranch();
+  const url = `${GH_API_BASE}/repos/${owner}/${repo}/contents/?ref=${encodeURIComponent(branch)}&_=${Date.now()}`;
+  const res = await fetch(url, { headers: ghAuthHeaders(), cache: 'no-store' });
+  if (!res.ok) {
+    const t = await res.text().catch(() => '');
+    throw new Error(`Không liệt kê được thư mục gốc repo (${res.status}): ${t}`);
+  }
+  return await res.json(); // mảng {name, type: 'dir'|'file', path, ...}
+}
+async function ghListVocabFolders() {
+  const items = await ghListRootContents();
+  return items.filter(i => i.type === 'dir').map(i => i.name).sort();
+}
+
 function ghAuthHeaders() {
   const headers = { 'Accept': 'application/vnd.github+json' };
   const token = ghGetToken();

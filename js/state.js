@@ -25,14 +25,15 @@ const cleanStr = s => String(s == null ? '' : s).replace(/\\n/g, '\n');
 
 // ── LOAD ──
 async function loadAllFromGitHub() {
-  const vRes = await ghGetFile(CONFIG.github.vocabPath);
+  const vocabPath = ghVocabPath();
+  const vRes = await ghGetFile(vocabPath);
   if (!vRes.content) {
-    throw new Error(`Không tìm thấy ${CONFIG.github.vocabPath} trên GitHub. Hãy tạo file này trong repo trước (xem README.md).`);
+    throw new Error(`Không tìm thấy ${vocabPath} trên GitHub. Hãy tạo file này trong repo trước (xem README.md), hoặc tải lên qua nút 📁 Bộ từ vựng.`);
   }
   vocab = Object.assign({ headers: [], rows: [], sheets: {} }, vRes.content);
   vocabSha = vRes.sha;
 
-  const pRes = await ghGetFile(CONFIG.github.progressPath);
+  const pRes = await ghGetFile(ghProgressPath());
   if (pRes.content) {
     progress = Object.assign(progress, pRes.content);
     progressSha = pRes.sha;
@@ -41,6 +42,26 @@ async function loadAllFromGitHub() {
   }
   currentWordIndex = progress.current_index || 0;
   buildAllFields();
+}
+
+// ── CHUYỂN SANG 1 BỘ TỪ VỰNG (thư mục) KHÁC ──
+async function switchToFolder(folderName) {
+  ghSetCurrentFolder(folderName);
+  vocab = { headers: [], rows: [], sheets: {} };
+  progress = {
+    stats: {}, current_index: 0, field_order: null,
+    hidden_columns: { study: [], review: [] },
+    quiz_scenarios: [], furigana: false,
+    volumes: { jp: 0.8, vi: 1.0, en: 0.9 }
+  };
+  vocabSha = null; progressSha = null; allFields = [];
+  currentMode = 'study'; currentWordIndex = 0; currentFieldIndex = 1;
+  reviewPool = []; reviewIndex = 0;
+  await loadAllFromGitHub();
+  isFuriganaEnabled = !!progress.furigana;
+  loadVolumes();
+  updateFuriganaBtn();
+  updateDisplay();
 }
 
 function buildAllFields() {
@@ -78,16 +99,16 @@ async function saveProgressToGitHub(force) {
   _savingInFlight = true;
   setSyncStatus('saving');
   try {
-    const res = await ghPutFile(CONFIG.github.progressPath, progress, progressSha, '📈 Cập nhật tiến độ học tập');
+    const res = await ghPutFile(ghProgressPath(), progress, progressSha, '📈 Cập nhật tiến độ học tập');
     progressSha = res.content.sha;
     _dirtyProgress = false; _lastSaveTime = Date.now();
     setSyncStatus('saved');
   } catch (err) {
     if (err.status === 409) {
       try {
-        const fresh = await ghGetFile(CONFIG.github.progressPath);
+        const fresh = await ghGetFile(ghProgressPath());
         progressSha = fresh.sha;
-        const res = await ghPutFile(CONFIG.github.progressPath, progress, progressSha, '📈 Cập nhật tiến độ học tập');
+        const res = await ghPutFile(ghProgressPath(), progress, progressSha, '📈 Cập nhật tiến độ học tập');
         progressSha = res.content.sha; _dirtyProgress = false; _lastSaveTime = Date.now();
         setSyncStatus('saved');
       } catch (e2) { setSyncStatus('error', e2.message); }
@@ -101,15 +122,15 @@ async function saveProgressToGitHub(force) {
 async function saveVocabToGitHub(message) {
   setSyncStatus('saving');
   try {
-    const res = await ghPutFile(CONFIG.github.vocabPath, vocab, vocabSha, message || '✏️ Cập nhật dữ liệu từ vựng');
+    const res = await ghPutFile(ghVocabPath(), vocab, vocabSha, message || '✏️ Cập nhật dữ liệu từ vựng');
     vocabSha = res.content.sha;
     setSyncStatus('saved');
     return true;
   } catch (err) {
     if (err.status === 409) {
-      const fresh = await ghGetFile(CONFIG.github.vocabPath);
+      const fresh = await ghGetFile(ghVocabPath());
       vocabSha = fresh.sha;
-      const res = await ghPutFile(CONFIG.github.vocabPath, vocab, vocabSha, message || '✏️ Cập nhật dữ liệu từ vựng');
+      const res = await ghPutFile(ghVocabPath(), vocab, vocabSha, message || '✏️ Cập nhật dữ liệu từ vựng');
       vocabSha = res.content.sha;
       setSyncStatus('saved');
       return true;
