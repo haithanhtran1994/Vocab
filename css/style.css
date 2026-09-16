@@ -1,6 +1,11 @@
 :root{--primary:#2563eb;--success:#16a34a;--warning:#ca8a04;--danger:#ef4444;--bg:#f1f5f9}
-html,body{margin:0;padding:0;width:100%;min-height:100%;background:var(--bg)}
-body{font-family:'Segoe UI',sans-serif;display:flex;flex-direction:column;align-items:center;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch}
+/* ── Khoá bounce/kéo cả trang trên iOS Safari ──
+   html = "khung ngoài cùng", cố định tuyệt đối, không cho co giãn/di chuyển.
+   body = nơi DUY NHẤT được cuộn dọc bên trong, nên vuốt ngoài vùng card
+   (nền, khoảng trống...) không còn kéo lệch cả trang đi nữa. */
+html{height:100%;overflow:hidden;overscroll-behavior:none;touch-action:pan-y}
+html,body{margin:0;padding:0;width:100%;background:var(--bg)}
+body{height:100%;font-family:'Segoe UI',sans-serif;display:flex;flex-direction:column;align-items:center;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;touch-action:pan-y}
 .container{width:95%;max-width:700px;background:white;padding:25px;border-radius:16px;box-shadow:0 10px 15px -3px rgba(0,0,0,0.1);margin:20px 0;position:relative}
 .hidden{display:none!important}
 .input-row{margin-bottom:12px}

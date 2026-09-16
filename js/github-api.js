@@ -71,6 +71,22 @@ function ghAuthHeaders() {
   return headers;
 }
 
+// Lấy file NHỊ PHÂN (audio...) qua GitHub API dạng "raw" (không phải base64-JSON,
+// nên không bị giới hạn ~1MB như ghGetFile — raw hỗ trợ tới 100MB). Trả về Blob.
+async function ghGetRawFile(path) {
+  const { owner, repo, branch } = ghGetOwnerRepoBranch();
+  const url = `${GH_API_BASE}/repos/${owner}/${repo}/contents/${path}?ref=${encodeURIComponent(branch)}`;
+  const res = await fetch(url, {
+    headers: { ...ghAuthHeaders(), Accept: 'application/vnd.github.raw' },
+    cache: 'no-store'
+  });
+  if (!res.ok) {
+    const t = await res.text().catch(() => '');
+    throw new Error(`GET raw ${path} thất bại (${res.status}): ${t}`);
+  }
+  return await res.blob();
+}
+
 // UTF-8 safe base64 (vì nội dung có tiếng Việt/tiếng Nhật)
 function ghB64Encode(str) {
   return btoa(unescape(encodeURIComponent(str)));

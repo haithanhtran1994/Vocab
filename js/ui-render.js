@@ -250,12 +250,15 @@ function updateDisplay(shouldSpeak = false) {
       displayEl.innerHTML = items.map(item => {
         const rowIdx = fullRows.indexOf(item);
         const viClean = cleanStr(item.vi || ''), jpClean = cleanStr(item.jp || '');
+        const audioClean = cleanStr(item.audio || '').trim();
         const viAttr = escapeAttr(viClean);
         const jpHtml = renderJpHtmlSafe(jpClean);
         const jpRaw = escapeAttr(jpClean.replace(/\(.*?\)/g, '').trim());
+        const audioAttr = escapeAttr(audioClean);
+        const speakIcon = audioClean ? '🎧' : '🔊'; // 🎧 = có audio thu sẵn, 🔊 = giọng đọc trình duyệt
         return `<span class="jp-line" data-vi="${viAttr}" data-sheet="${escapeHtml(fc.sheetName)}" data-row-idx="${rowIdx}">
           <span class="jp-text">${jpHtml || '&nbsp;'}</span>
-          <button class="jp-speak-btn" data-jp="${jpRaw}" title="Phát âm dòng này">🔊</button>
+          <button class="jp-speak-btn" data-jp="${jpRaw}" data-audio="${audioAttr}" title="Phát âm dòng này">${speakIcon}</button>
           <span class="jp-vi-icon">💬</span>
         </span>`;
       }).join('');
@@ -269,7 +272,7 @@ function updateDisplay(shouldSpeak = false) {
 }
 
 // ── NAVIGATION ──
-function stopSpeech() { _speechSession++; synth.cancel(); }
+function stopSpeech() { _speechSession++; synth.cancel(); if (_currentAudioEl) { try { _currentAudioEl.pause(); } catch (e) {} _currentAudioEl = null; } }
 function clearFieldTimer() { if (fieldClickTimer !== null) { clearTimeout(fieldClickTimer); fieldClickTimer = null; } }
 function moveWord(step) {
   clearFieldTimer(); stopSpeech();

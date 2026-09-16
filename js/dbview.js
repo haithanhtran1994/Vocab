@@ -70,14 +70,21 @@ function parseXlsxWorkbook(wb) {
     if (!rr.length) return;
     const keys = Object.keys(rr[0]);
     const find = c => keys.find(k => c.includes(k.toLowerCase().trim())) || keys[0];
-    const cm = { stt: find(['stt', 'id', 'no', 'số']), idx: find(['idx', 'index']), jp: find(['jp', 'japanese', 'ja', 'kanji', 'từ']), vi: find(['vi', 'vietnamese', 'vn', 'nghĩa', 'nghia', 'meaning', 'dịch']) };
+    const findOptional = c => keys.find(k => c.includes(k.toLowerCase().trim())) || null;
+    const cm = {
+      stt: find(['stt', 'id', 'no', 'số']), idx: find(['idx', 'index']),
+      jp: find(['jp', 'japanese', 'ja', 'kanji', 'từ']),
+      vi: find(['vi', 'vietnamese', 'vn', 'nghĩa', 'nghia', 'meaning', 'dịch']),
+      audio: findOptional(['audio', 'mp3', 'wav', 'sound', 'âm thanh'])
+    };
     let lastStt = ''; const items = [];
     rr.forEach(r => {
       const rawStt = r[cm.stt];
       const stt = (rawStt === null || rawStt === undefined || rawStt === '') ? lastStt : String(rawStt);
       if (stt) lastStt = stt;
       const jp = cleanStr(r[cm.jp]), vi = cleanStr(r[cm.vi]);
-      if (stt || jp) items.push({ stt, idx: r[cm.idx] || '', jp, vi });
+      const audio = cm.audio ? cleanStr(r[cm.audio]) : '';
+      if (stt || jp) items.push({ stt, idx: r[cm.idx] || '', jp, vi, audio });
     });
     sheets[sn] = items;
   });

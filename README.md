@@ -81,7 +81,34 @@ hiện xung đột (lỗi 409 do sha cũ), tự tải lại bản mới nhất r
 lần. Đây là kiểu "ai lưu sau thắng" (last-write-wins) — đủ dùng cho 1 người
 dùng trên vài thiết bị, không phù hợp nhiều người sửa đồng thời.
 
-## 6. Giới hạn cần biết
+## 6. Dùng file audio thu sẵn cho câu ví dụ (tùy chọn)
+
+Nếu đã có file `.wav`/`.mp3` thu sẵn cho câu ví dụ, thêm cột **`audio`** vào sheet
+`CauVi` (hoặc sheet phụ tương đương) trong Excel, điền đường dẫn file đó **tính
+từ gốc repo private**, ví dụ:
+
+```
+audio/N2_vocab/1.wav
+```
+
+Rồi tự upload các file `.wav` đó vào đúng đường dẫn trong repo private (qua
+giao diện web GitHub, hoặc `git push` bình thường — phần này app không tự làm
+thay, chỉ đọc/phát file đã có sẵn).
+
+- Có `audio` → app tải file qua GitHub API (repo private nên cần xác thực
+  bằng token, không dùng được link công khai) rồi phát trực tiếp, có cache lại
+  trong phiên học để không tải lại nhiều lần. Nút 🔊 sẽ đổi thành 🎧 để biết
+  dòng đó có audio thu sẵn.
+- Không điền `audio` (để trống) → app dùng giọng đọc trình duyệt như bình
+  thường, không có gì thay đổi.
+- Tải/phát file lỗi (sai đường dẫn, file bị xoá...) → tự động rơi về giọng đọc
+  trình duyệt, không làm đứng app.
+
+File audio không giới hạn kích thước theo cách cũ (~1MB của base64-JSON) vì
+app lấy qua chế độ "raw" của GitHub API, hỗ trợ tới 100MB/file — quá đủ cho
+audio 1 câu ví dụ ngắn.
+
+## 7. Giới hạn cần biết
 
 - **Rate limit**: GitHub API cho phép 5000 request có xác thực/giờ — thoải
   mái cho dùng cá nhân.

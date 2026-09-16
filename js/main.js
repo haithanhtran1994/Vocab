@@ -64,10 +64,11 @@ document.addEventListener('DOMContentLoaded', () => {
       e.stopPropagation();
       const jpLine = speakBtn.closest('.jp-line');
       const jpText = (speakBtn.getAttribute('data-jp') || '').trim();
+      const audioPath = (speakBtn.getAttribute('data-audio') || '').trim();
       const viRaw = jpLine?.getAttribute('data-vi') || '';
-      if (jpText) {
+      if (jpText || audioPath) {
         const mySession = ++_speechSession;
-        _speakSingle(jpText, mySession, () => { if (viRaw && viRaw !== 'N.A') setTimeout(() => _speakSingle(viRaw, mySession, null), 200); });
+        _speakJapanesePart(jpText, audioPath, mySession, () => { if (viRaw && viRaw !== 'N.A') setTimeout(() => _speakSingle(viRaw, mySession, null), 200); });
       }
       return;
     }
