@@ -61,7 +61,16 @@ async function ghListRootContents() {
 }
 async function ghListVocabFolders() {
   const items = await ghListRootContents();
-  return items.filter(i => i.type === 'dir').map(i => i.name).sort();
+  const dirs = items.filter(i => i.type === 'dir').map(i => i.name);
+  // Chỉ coi là "bộ từ vựng" nếu thư mục đó thực sự có vocab.json ngay bên trong
+  // (loại các thư mục khác như 'audio/' chỉ chứa file media, không phải bộ từ).
+  const checks = await Promise.all(dirs.map(async d => {
+    try {
+      const r = await ghGetFile(`${d}/vocab.json`);
+      return r.content ? d : null;
+    } catch (e) { return null; }
+  }));
+  return checks.filter(Boolean).sort();
 }
 
 function ghAuthHeaders() {

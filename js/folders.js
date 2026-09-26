@@ -39,11 +39,12 @@ async function selectVocabFolder(folderName) {
   if (folderName === ghGetCurrentFolder()) { closeFolderModal(); return; }
   if (_dirtyProgress) await saveProgressToGitHub(true); // chốt tiến độ bộ cũ trước khi rời đi
   closeFolderModal();
-  const list = document.getElementById('folder-list');
   try {
     await switchToFolder(folderName);
   } catch (err) {
     alert('Lỗi tải bộ từ vựng "' + folderName + '": ' + err.message);
+    const stillStuckOnConnectScreen = !document.getElementById('connect-screen').classList.contains('hidden');
+    if (stillStuckOnConnectScreen) openFolderModal(); // mở lại để chọn thử bộ khác
   }
 }
 

@@ -17,7 +17,7 @@ window.CONFIG = {
     // Mỗi "bộ từ vựng" là 1 thư mục trong repo private, chứa vocab.json
     // (+ progress.json, tự tạo khi lưu tiến độ lần đầu nếu chưa có).
     // defaultFolder là thư mục được load khi mở app lần đầu (chưa chọn gì).
-    defaultFolder: 'vocab-data'
+    defaultFolder: 'N2_vocab'
   },
   // Không commit-per-thao-tác: gom lại rồi mới lưu để tránh spam commit.
   autosaveDebounceMs: 8000,     // sau 8s không thao tác gì thêm -> tự lưu tiến độ

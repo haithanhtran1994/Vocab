@@ -62,6 +62,12 @@ async function switchToFolder(folderName) {
   loadVolumes();
   updateFuriganaBtn();
   updateDisplay();
+  // Đảm bảo chuyển hẳn sang màn hình học — kể cả khi lần load MẶC ĐỊNH lúc kết
+  // nối ban đầu bị lỗi (thư mục mặc định không tồn tại) và người dùng vừa chọn
+  // 1 thư mục khác để tải, màn hình kết nối vẫn đang hiện thì giờ ẩn đi luôn.
+  document.getElementById('connect-screen').classList.add('hidden');
+  document.getElementById('study-screen').classList.remove('hidden');
+  document.getElementById('audio-unlock').classList.remove('hidden');
 }
 
 function buildAllFields() {

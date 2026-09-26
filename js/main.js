@@ -28,7 +28,21 @@ async function connectAndLoad() {
     await loadAllFromGitHub();
     initAppUI();
   } catch (err) {
-    alert('Lỗi kết nối GitHub: ' + err.message);
+    // Thư mục mặc định (config.js) có thể không còn tồn tại (đã đổi tên/cấu trúc
+    // thư mục trong repo) -> thử liệt kê các bộ từ vựng thật sự có, cho chọn
+    // ngay tại đây thay vì kẹt lại ở màn hình lỗi không lối thoát.
+    try {
+      const folders = await ghListVocabFolders();
+      if (folders.length) {
+        alert(`Không tải được thư mục mặc định ("${ghGetCurrentFolder()}").\nRepo có ${folders.length} bộ từ vựng khác — chọn 1 bộ ở danh sách tiếp theo.`);
+        renderFolderList(folders);
+        document.getElementById('folder-modal-root').classList.remove('hidden');
+      } else {
+        alert('Lỗi kết nối GitHub: ' + err.message);
+      }
+    } catch (err2) {
+      alert('Lỗi kết nối GitHub: ' + err.message);
+    }
   } finally { btn.disabled = false; btn.innerText = 'Kết nối & Tải dữ liệu'; }
 }
 
