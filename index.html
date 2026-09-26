@@ -35,6 +35,23 @@
   <button onclick="unlockAudio()" style="background:var(--success);color:white;padding:20px 40px;font-size:1.2rem">BẮT ĐẦU NGAY</button>
 </div>
 
+<!-- Modal chọn/tải bộ từ vựng — đặt ở cấp ngoài cùng (không nằm trong study-screen)
+     để dùng được cả khi study-screen đang ẩn (vd lúc kết nối lần đầu bị lỗi). -->
+<div id="folder-modal-root" class="modal-overlay hidden">
+  <div class="column-modal">
+    <h3 style="margin-top:0">📁 Chọn bộ từ vựng</h3>
+    <p style="font-size:.8rem;color:#64748b;margin:0 0 8px">Mỗi bộ là 1 thư mục trong repo private chứa dữ liệu.</p>
+    <div id="folder-list" style="max-height:280px;overflow-y:auto;margin:10px 0"></div>
+    <hr style="border:none;border-top:1px solid #e2e8f0;margin:14px 0">
+    <p style="font-size:.8rem;color:#64748b;margin:0 0 8px">Tải 1 thư mục từ máy tính lên (thư mục phải chứa file <b>vocab.json</b> ngay bên trong, vd <code>N2_vocab/vocab.json</code>). Nếu thư mục đã có sẵn trên GitHub, app sẽ hỏi trước khi ghi đè.</p>
+    <button class="btn-sync" style="background:#8b5cf6" onclick="triggerUploadLocalFolder()">⬆️ Chọn thư mục từ máy...</button>
+    <input type="file" id="localFolderInput" webkitdirectory directory multiple class="hidden">
+    <div class="modal-footer" style="margin-top:14px">
+      <button class="btn-cancel" onclick="closeFolderModal()" style="grid-column:1/-1">Đóng</button>
+    </div>
+  </div>
+</div>
+
 <!-- ── MÀN HÌNH KẾT NỐI GITHUB ── -->
 <div id="connect-screen" class="container">
   <h2 style="text-align:center">🔗 Kết nối GitHub</h2>
@@ -76,21 +93,6 @@
     </div>
     <div style="flex:1;text-align:right">
       <button class="btn-hide-cols" onclick="openColumnModal()">👁️ Cột</button>
-    </div>
-  </div>
-
-  <div id="folder-modal-root" class="modal-overlay hidden">
-    <div class="column-modal">
-      <h3 style="margin-top:0">📁 Chọn bộ từ vựng</h3>
-      <p style="font-size:.8rem;color:#64748b;margin:0 0 8px">Mỗi bộ là 1 thư mục trong repo private chứa dữ liệu.</p>
-      <div id="folder-list" style="max-height:280px;overflow-y:auto;margin:10px 0"></div>
-      <hr style="border:none;border-top:1px solid #e2e8f0;margin:14px 0">
-      <p style="font-size:.8rem;color:#64748b;margin:0 0 8px">Tải 1 thư mục từ máy tính lên (thư mục phải chứa file <b>vocab.json</b> ngay bên trong, vd <code>N2_vocab/vocab.json</code>). Nếu thư mục đã có sẵn trên GitHub, app sẽ hỏi trước khi ghi đè.</p>
-      <button class="btn-sync" style="background:#8b5cf6" onclick="triggerUploadLocalFolder()">⬆️ Chọn thư mục từ máy...</button>
-      <input type="file" id="localFolderInput" webkitdirectory directory multiple class="hidden">
-      <div class="modal-footer" style="margin-top:14px">
-        <button class="btn-cancel" onclick="closeFolderModal()" style="grid-column:1/-1">Đóng</button>
-      </div>
     </div>
   </div>
 
