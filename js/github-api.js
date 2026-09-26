@@ -115,7 +115,23 @@ async function ghGetFile(path) {
     throw new Error(`GET ${path} thất bại (${res.status}): ${t}`);
   }
   const data = await res.json();
-  const raw = ghB64Decode((data.content || '').replace(/\n/g, ''));
+  let raw;
+  if (data.content && data.encoding === 'base64') {
+    // File nhỏ hơn 1MB: GitHub trả sẵn nội dung base64 ngay trong response này.
+    raw = ghB64Decode(data.content.replace(/\n/g, ''));
+  } else {
+    // File lớn hơn 1MB: endpoint này KHÔNG nhúng nội dung (content rỗng), phải
+    // gọi lại đúng URL đó ở chế độ "raw" để lấy trọn nội dung (raw hỗ trợ tới 100MB).
+    const rawRes = await fetch(url, {
+      headers: { ...ghAuthHeaders(), Accept: 'application/vnd.github.raw' },
+      cache: 'no-store'
+    });
+    if (!rawRes.ok) {
+      const t = await rawRes.text().catch(() => '');
+      throw new Error(`GET raw ${path} thất bại (${rawRes.status}): ${t}`);
+    }
+    raw = await rawRes.text();
+  }
   let parsed;
   try { parsed = JSON.parse(raw); } catch (e) {
     throw new Error(`File ${path} không phải JSON hợp lệ: ${e.message}`);
