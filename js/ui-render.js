@@ -240,7 +240,7 @@ function updateDisplay(shouldSpeak = false) {
   if (!fc.isSheet) {
     const txt = fc.content || '';
     displayEl.innerHTML = isFuriganaEnabled ? formatFurigana(txt).replace(/\n/g, '<br>') : escapeHtml(txt.replace(/\(.*?\)/g, '')).replace(/\n/g, '<br>');
-    hintEl.innerText = 'Chạm để đọc';
+    hintEl.innerText = 'Chạm để chuyển trường';
   } else {
     const items = fc.items || [];
     const fullRows = vocab.sheets[fc.sheetName] || [];
@@ -289,6 +289,15 @@ function changeField(dir) {
   clearFieldTimer(); stopSpeech();
   const h = progress.hidden_columns[currentMode] || []; let next = currentFieldIndex;
   while (true) { next += dir; if (next < 1 || next >= allFields.length) return false; if (!h.includes(allFields[next].key)) { currentFieldIndex = next; updateDisplay(true); return true; } }
+}
+// Chạm vào thẻ: sang trường kế tiếp (bỏ qua cột đang ẩn); hết trường thì quay lại trường đầu.
+function nextFieldWrap() {
+  if (changeField(1)) return;
+  clearFieldTimer(); stopSpeech();
+  const h = progress.hidden_columns[currentMode] || [];
+  for (let i = 1; i < allFields.length; i++) {
+    if (!h.includes(allFields[i].key)) { currentFieldIndex = i; updateDisplay(true); return; }
+  }
 }
 function setStatus(status) {
   const word = currentMode === 'study' ? vocab.rows[currentWordIndex] : reviewPool[reviewIndex];
