@@ -117,7 +117,7 @@
   <div class="card">
     <div class="card-touch-zone">
       <div id="display-text" class="card-content">---</div>
-      <div id="speaker-hint" style="position:absolute;bottom:15px;left:50%;transform:translateX(-50%);font-size:11px;color:#cbd5e1;letter-spacing:1px;pointer-events:none;text-transform:uppercase;font-weight:bold">Chạm để đọc</div>
+      <div id="speaker-hint" style="position:absolute;bottom:15px;left:50%;transform:translateX(-50%);font-size:11px;color:#cbd5e1;letter-spacing:1px;pointer-events:none;text-transform:uppercase;font-weight:bold">Chạm để chuyển trường</div>
     </div>
   </div>
 
@@ -127,6 +127,7 @@
       <label><input type="checkbox" id="autoSpeak" checked> Tự động đọc</label>
       <label id="random-multi-wrap"><input type="checkbox" id="randomMulti" checked> Random</label>
       <button onclick="enterEditMode()" style="background:#f59e0b;color:white;border:none;border-radius:8px;padding:6px 12px;font-size:.8rem;font-weight:bold">✏️ Edit</button>
+      <button id="btn-speak-card" onclick="speakText()" title="Đọc thẻ hiện tại" style="background:#0891b2;color:white;border:none;border-radius:8px;padding:6px 10px;font-size:.9rem;font-weight:bold;line-height:1">🔊</button>
     </div>
     <div style="display:flex;gap:5px;width:100%;margin-top:5px">
       <button id="furiganaToggle" onclick="toggleFurigana()" style="flex:1;background:#e2e8f0;color:#475569;padding:8px;border-radius:8px;font-size:.8rem;font-weight:bold;border:1px solid #cbd5e1">Furigana: OFF</button>
