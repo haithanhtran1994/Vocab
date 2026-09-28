@@ -88,8 +88,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     const jpLine = e.target.closest('.jp-line');
     if (jpLine) { const vi = jpLine.getAttribute('data-vi') || ''; if (vi) showScreentip(jpLine, vi); return; }
-    const fc = getFieldContent(currentMode === 'study' ? vocab.rows[currentWordIndex] : reviewPool[reviewIndex], currentFieldIndex);
-    if (!fc.isSheet) speakText();
+    // Chạm vào phần còn lại của thẻ -> sang trường kế tiếp (hết trường thì quay về đầu).
+    // Việc đọc giờ do nút 🔊 cạnh nút Edit đảm nhiệm.
+    nextFieldWrap();
   });
 
   const curField = document.getElementById('curr-field');
