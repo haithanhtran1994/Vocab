@@ -108,6 +108,13 @@ File audio không giới hạn kích thước theo cách cũ (~1MB của base64-
 app lấy qua chế độ "raw" của GitHub API, hỗ trợ tới 100MB/file — quá đủ cho
 audio 1 câu ví dụ ngắn.
 
+## Phím tắt tuỳ chỉnh (chỉ Windows)
+
+Trên Windows có thêm nút ⌨️ cạnh 📁 và ⚙️: bấm để mở bảng gán phím cho các chức năng
+(di chuyển từ/trường, đọc, đánh dấu, đổi chế độ, furigana, tốc độ...). Cấu hình lưu vào
+`mapping.json` ở **gốc repo private Data** (cùng repo với data) và tự tải về khi kết nối trên
+máy Windows khác. Trên iPhone/Safari/macOS nút này không hiện và phím tắt giữ như cũ.
+
 ## 7. Giới hạn cần biết
 
 - **Rate limit**: GitHub API cho phép 5000 request có xác thực/giờ — thoải

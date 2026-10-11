@@ -68,6 +68,7 @@ async function switchToFolder(folderName) {
   document.getElementById('connect-screen').classList.add('hidden');
   document.getElementById('study-screen').classList.remove('hidden');
   document.getElementById('audio-unlock').classList.remove('hidden');
+  if (typeof loadKeymap === 'function') loadKeymap(); // chỉ có tác dụng trên Windows
 }
 
 function buildAllFields() {

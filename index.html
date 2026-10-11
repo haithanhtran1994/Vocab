@@ -52,6 +52,20 @@
   </div>
 </div>
 
+<!-- Bảng cài đặt phím tắt (chỉ dùng trên Windows) -->
+<div id="keymap-modal-root" class="modal-overlay hidden">
+  <div class="column-modal" style="max-width:520px">
+    <h3 style="margin-top:0">⌨️ Cài đặt phím tắt</h3>
+    <p style="font-size:.8rem;color:#64748b;margin:0 0 8px">Bấm vào ô bên phải rồi nhấn phím (hoặc tổ hợp như Ctrl+K) để gán. Bấm ✕ để bỏ gán. Lưu vào <code>mapping.json</code> trong repo Data. Lưu ý: Edge giữ riêng một số phím như Ctrl+W, Ctrl+T, F11...</p>
+    <div id="keymap-list" class="column-list"></div>
+    <div class="modal-footer" style="grid-template-columns:1fr 1fr 1fr">
+      <button class="btn-confirm" onclick="confirmKeymap()">OK</button>
+      <button class="btn-cancel" onclick="closeKeymapModal()">Cancel</button>
+      <button style="background:#64748b;color:white" onclick="resetKeymapDraft()">Mặc định</button>
+    </div>
+  </div>
+</div>
+
 <!-- ── MÀN HÌNH KẾT NỐI GITHUB ── -->
 <div id="connect-screen" class="container">
   <h2 style="text-align:center">🔗 Kết nối GitHub</h2>
@@ -73,6 +87,7 @@
     <div id="sync-status"></div>
     <div style="flex:1;text-align:right">
       <button class="btn-gear" onclick="openFolderModal()" title="Chọn bộ từ vựng">📁</button>
+      <button id="btn-keymap" class="btn-gear hidden" onclick="openKeymapModal()" title="Phím tắt (Windows)">⌨️</button>
       <button class="btn-gear" onclick="openSettings()" title="Cài đặt GitHub">⚙️</button>
     </div>
   </div>
@@ -202,6 +217,7 @@
 <script src="js/github-api.js"></script>
 <script src="js/state.js"></script>
 <script src="js/folders.js"></script>
+<script src="js/keymap.js"></script>
 <script src="js/ui-render.js"></script>
 <script src="js/speech.js"></script>
 <script src="js/edit.js"></script>

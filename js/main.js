@@ -13,6 +13,7 @@ function initAppUI() {
   updateFuriganaBtn();
   updateDisplay();
   document.getElementById('audio-unlock').classList.remove('hidden');
+  if (typeof loadKeymap === 'function') loadKeymap(); // chỉ có tác dụng trên Windows
 }
 
 async function connectAndLoad() {
@@ -108,6 +109,7 @@ window.onclick = function (e) {
 };
 
 window.addEventListener('keydown', e => {
+  if (window.KEYMAP_ACTIVE) return; // Windows: keymap.js xử lý phím tắt
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.contentEditable === 'true') return;
   const k = e.key.toLowerCase();
   if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' '].includes(k)) e.preventDefault();
